@@ -2,6 +2,7 @@ import Foundation
 import Capacitor
 import Contacts
 import ContactsUI
+import SwiftUI
 
 enum CallingMethod {
     case GetContact
@@ -9,6 +10,7 @@ enum CallingMethod {
     case CreateContact
     case DeleteContact
     case PickContact
+    case SelectLimitedContacts
 }
 
 @objc(ContactsPlugin)
@@ -27,7 +29,7 @@ public class ContactsPlugin: CAPPlugin, CNContactPickerDelegate {
             permissionState = "prompt"
         case .restricted, .denied:
             permissionState = "denied"
-        case .authorized:
+        case .authorized, .limited:
             permissionState = "granted"
         @unknown default:
             permissionState = "prompt"
@@ -59,7 +61,7 @@ public class ContactsPlugin: CAPPlugin, CNContactPickerDelegate {
         switch CNContactStore.authorizationStatus(for: .contacts) {
         case .notDetermined, .restricted, .denied:
             return false
-        case .authorized:
+        case .authorized, .limited:
             return true
         @unknown default:
             return false
@@ -87,6 +89,8 @@ public class ContactsPlugin: CAPPlugin, CNContactPickerDelegate {
             deleteContact(call)
         case .PickContact:
             pickContact(call)
+        case .SelectLimitedContacts:
+            selectLimitedContacts(call)
         default:
             // No method was being called,
             // so nothing has to be done here.
@@ -215,5 +219,74 @@ public class ContactsPlugin: CAPPlugin, CNContactPickerDelegate {
         ])
 
         self.bridge?.releaseCall(call)
+    }
+
+    @objc func selectLimitedContacts(_ call: CAPPluginCall) {
+        if !isContactsPermissionGranted() {
+            requestContactsPermission(call, CallingMethod.SelectLimitedContacts)
+        } else {
+            guard #available(iOS 18.0, *) else {
+                call.reject("Requires iOS 18 or newer for limited contacts picker.")
+                return
+            }
+
+            DispatchQueue.main.async {
+                var hostingController: UIHostingController<ContactAccessPickerHostingView>! = nil
+
+                let pickerView = ContactAccessPickerHostingView { identifiers in
+                    let store = CNContactStore()
+                    let keys: [CNKeyDescriptor] = [
+                        CNContactGivenNameKey as CNKeyDescriptor,
+                        CNContactFamilyNameKey as CNKeyDescriptor,
+                        CNContactPhoneNumbersKey as CNKeyDescriptor
+                    ]
+
+                    var result: [[String: Any]] = []
+
+                    for id in identifiers {
+                        do {
+                            let contact = try store.unifiedContact(withIdentifier: id, keysToFetch: keys)
+                            result.append([
+                                "identifier": contact.identifier,
+                                "givenName": contact.givenName,
+                                "familyName": contact.familyName,
+                                "phoneNumbers": contact.phoneNumbers.map { $0.value.stringValue }
+                            ])
+                        } catch {
+                            print("Failed to fetch contact with id \(id): \(error)")
+                        }
+                    }
+
+                    call.resolve(["contacts": result])
+
+                    DispatchQueue.main.async {
+                        hostingController.dismiss(animated: true)
+                    }
+                }
+
+                hostingController = UIHostingController(rootView: pickerView)
+                hostingController.modalPresentationStyle = .fullScreen
+                self.bridge?.viewController?.present(hostingController, animated: true)
+            }
+        }
+    }
+}
+
+// SwiftUI view for contact access picker
+@available(iOS 18.0, *)
+struct ContactAccessPickerHostingView: View {
+    @State private var isPresented = true
+    var completion: ([String]) -> Void
+
+    var body: some View {
+        EmptyView()
+            .contactAccessPicker(isPresented: $isPresented) { identifiers in
+                completion(identifiers)
+            }
+            .onChange(of: isPresented) { newValue in
+                if !newValue {
+                        completion([])
+                }
+            }
     }
 }
