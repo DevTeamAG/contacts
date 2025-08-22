@@ -98,6 +98,21 @@ pickContact(options: PickContactOptions) => Promise<PickContactResult>
 --------------------
 
 
+### selectLimitedContacts(...)
+
+```typescript
+selectLimitedContacts(options: SelectLimitedContactsOptions) => Promise<SelectLimitedContactsResult>
+```
+
+| Param         | Type                                                                       |
+| ------------- | -------------------------------------------------------------------------- |
+| **`options`** | <code>[SelectLimitedContactsOptions](#selectlimitedcontactsoptions)</code> |
+
+**Returns:** <code>Promise&lt;[SelectLimitedContactsResult](#selectlimitedcontactsresult)&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -355,6 +370,20 @@ pickContact(options: PickContactOptions) => Promise<PickContactResult>
 
 
 #### PickContactOptions
+
+| Prop             | Type                                   |
+| ---------------- | -------------------------------------- |
+| **`projection`** | <code>[Projection](#projection)</code> |
+
+
+#### SelectLimitedContactsResult
+
+| Prop           | Type                          |
+| -------------- | ----------------------------- |
+| **`contacts`** | <code>ContactPayload[]</code> |
+
+
+#### SelectLimitedContactsOptions
 
 | Prop             | Type                                   |
 | ---------------- | -------------------------------------- |
