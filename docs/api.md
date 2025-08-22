@@ -118,9 +118,9 @@ selectLimitedContacts(options: SelectLimitedContactsOptions) => Promise<SelectLi
 
 #### PermissionStatus
 
-| Prop           | Type                                             |
-| -------------- | ------------------------------------------------ |
-| **`contacts`** | <code>[PermissionState](#permissionstate)</code> |
+| Prop           | Type                                                             |
+| -------------- | ---------------------------------------------------------------- |
+| **`contacts`** | <code>[ContactsPermissionState](#contactspermissionstate)</code> |
 
 
 #### GetContactResult
@@ -391,6 +391,11 @@ selectLimitedContacts(options: SelectLimitedContactsOptions) => Promise<SelectLi
 
 
 ### Type Aliases
+
+
+#### ContactsPermissionState
+
+<code>[PermissionState](#permissionstate) | 'limited'</code>
 
 
 #### PermissionState
