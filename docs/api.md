@@ -98,14 +98,29 @@ pickContact(options: PickContactOptions) => Promise<PickContactResult>
 --------------------
 
 
+### selectLimitedContacts(...)
+
+```typescript
+selectLimitedContacts(options: SelectLimitedContactsOptions) => Promise<SelectLimitedContactsResult>
+```
+
+| Param         | Type                                                                       |
+| ------------- | -------------------------------------------------------------------------- |
+| **`options`** | <code>[SelectLimitedContactsOptions](#selectlimitedcontactsoptions)</code> |
+
+**Returns:** <code>Promise&lt;[SelectLimitedContactsResult](#selectlimitedcontactsresult)&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
 #### PermissionStatus
 
-| Prop           | Type                                             |
-| -------------- | ------------------------------------------------ |
-| **`contacts`** | <code>[PermissionState](#permissionstate)</code> |
+| Prop           | Type                                                             |
+| -------------- | ---------------------------------------------------------------- |
+| **`contacts`** | <code>[ContactsPermissionState](#contactspermissionstate)</code> |
 
 
 #### GetContactResult
@@ -361,7 +376,26 @@ pickContact(options: PickContactOptions) => Promise<PickContactResult>
 | **`projection`** | <code>[Projection](#projection)</code> |
 
 
+#### SelectLimitedContactsResult
+
+| Prop           | Type                          |
+| -------------- | ----------------------------- |
+| **`contacts`** | <code>ContactPayload[]</code> |
+
+
+#### SelectLimitedContactsOptions
+
+| Prop             | Type                                   |
+| ---------------- | -------------------------------------- |
+| **`projection`** | <code>[Projection](#projection)</code> |
+
+
 ### Type Aliases
+
+
+#### ContactsPermissionState
+
+<code>[PermissionState](#permissionstate) | 'limited'</code>
 
 
 #### PermissionState
